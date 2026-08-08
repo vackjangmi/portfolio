@@ -32,10 +32,9 @@ test("server-renders the public short URL directory", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>sooyeol\.com — 짧은 주소 목록<\/title>/i);
-  assert.match(html, /필요한 링크를/);
-  assert.match(html, /짧게, 바로/);
   assert.match(html, /sooyeol\.com/);
-  assert.match(html, /짧은 주소 목록/);
+  assert.match(html, /주소를 불러오고 있습니다/);
+  assert.doesNotMatch(html, /필요한 링크를|CURATED BY SOOYEOL|ACTIVE LINKS/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Starter Project/i);
 });
 

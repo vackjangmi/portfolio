@@ -38,44 +38,8 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="public-directory">
-      <nav className="topbar" aria-label="사이트 헤더">
-        <a className="brand" href="#top" aria-label="sooyeol.com 홈">
-          <span className="brand-mark">s/</span>
-          <span>sooyeol.com</span>
-        </a>
-        <span className="directory-label">SHORT LINK DIRECTORY</span>
-      </nav>
-
-      <section className="hero public-hero" id="top">
-        <div className="eyebrow"><span /> CURATED BY SOOYEOL</div>
-        <h1>
-          필요한 링크를
-          <br />
-          <em>짧게, 바로.</em>
-        </h1>
-        <div className="public-intro">
-          <p className="hero-copy">
-            글과 영상으로 바로 가는 짧은 입구입니다.
-            <br />
-            주소를 누르면 원문으로 이동합니다.
-          </p>
-          <div className="link-total">
-            <strong>{String(links.length).padStart(2, "0")}</strong>
-            <span>ACTIVE LINKS</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="links-section public-links" id="links">
-        <div className="section-heading">
-          <div>
-            <p>DIRECTORY</p>
-            <h2>짧은 주소 목록</h2>
-          </div>
-          <span className="section-note">클릭하면 원문으로 이동합니다 ↗</span>
-        </div>
-
+    <main className="bare-directory">
+      <section className="links-section bare-links" aria-label="짧은 주소 목록">
         {loading ? (
           <div className="empty-state">주소를 불러오고 있습니다.</div>
         ) : error ? (
@@ -101,11 +65,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      <footer>
-        <span>sooyeol.com</span>
-        <span>SHORT LINKS · LONG MEMORY</span>
-      </footer>
     </main>
   );
 }
