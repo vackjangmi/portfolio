@@ -50,6 +50,7 @@ test("keeps persistence, redirects, and initial links wired", async () => {
 
   const admin = await readFile(new URL("../app/admin/page.tsx", import.meta.url), "utf8");
   assert.match(page, /fetch\("\/api\/links"/);
+  assert.match(page, /navigator\.clipboard\.writeText/);
   assert.match(admin, /method: "POST"/);
   assert.match(redirect, /Response\.redirect\(link\.targetUrl, 302\)/);
   assert.match(redirect, /export async function HEAD/);
@@ -60,6 +61,8 @@ test("keeps persistence, redirects, and initial links wired", async () => {
   assert.match(staticIndex, /href="\/eba-video"/);
   assert.match(staticIndex, /href="\/event-message"/);
   assert.match(staticIndex, /href="\/jpa-jsonb"/);
+  assert.match(staticIndex, /data-copy="\/eba"/);
+  assert.match(staticIndex, /navigator\.clipboard\.writeText/);
   const hostingConfig = JSON.parse(hosting);
   assert.equal(hostingConfig.d1, "DB");
   assert.equal(hostingConfig.r2, null);

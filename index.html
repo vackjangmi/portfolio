@@ -24,6 +24,7 @@
         margin: 0;
       }
       a { color: inherit; }
+      button { font: inherit; }
       .topbar {
         align-items: center;
         border-bottom: 1px solid rgba(21,21,18,.22);
@@ -157,7 +158,6 @@
         flex-direction: column;
         min-height: 252px;
         padding: 26px 28px 24px;
-        text-decoration: none;
         transition: background .18s ease;
       }
       .card:hover { background: #f7f3ea; }
@@ -180,11 +180,14 @@
         padding: 7px 10px;
       }
       .url {
+        color: inherit;
+        display: block;
         font-family: ui-monospace, monospace;
         font-size: clamp(21px, 3vw, 30px);
         font-weight: 700;
         letter-spacing: -.06em;
         margin: 35px 0 16px;
+        text-decoration: none;
       }
       .url span { color: #a29f96; }
       .url b { color: var(--orange); font-family: sans-serif; font-size: 16px; margin-left: 5px; }
@@ -202,6 +205,35 @@
         padding-top: 15px;
       }
       .card-bottom b { color: var(--ink); }
+      .card-actions {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+      }
+      .open-link {
+        color: var(--ink);
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .open-link:hover { color: var(--orange); }
+      .copy-button {
+        background: transparent;
+        border: 1px solid #d3cfc4;
+        border-radius: 999px;
+        color: var(--ink);
+        cursor: pointer;
+        font-family: ui-monospace, monospace;
+        font-size: 9px;
+        font-weight: 700;
+        min-width: 66px;
+        padding: 7px 10px;
+        transition: background .16s ease, border-color .16s ease;
+      }
+      .copy-button:hover { border-color: var(--ink); }
+      .copy-button.is-copied {
+        background: var(--acid);
+        border-color: var(--acid);
+      }
       footer {
         background: var(--ink);
         color: #8d8b83;
@@ -223,6 +255,8 @@
         .section-head { align-items: flex-start; flex-direction: column; gap: 18px; }
         .grid { grid-template-columns: 1fr; }
         .card { min-height: 235px; padding: 24px 20px 20px; }
+        .card-bottom { align-items: flex-start; flex-direction: column; gap: 12px; }
+        .card-actions { justify-content: space-between; width: 100%; }
         footer { flex-direction: column; gap: 10px; }
       }
     </style>
@@ -231,14 +265,28 @@
     <main>
       <section class="directory">
         <div class="grid">
-          <a class="card" href="/eba"><span class="card-top"><span class="number">01</span><span class="chip">techblog.jobkorea.co.kr</span></span><span class="url"><span>sooyeol.com/</span>eba <b>↗</b></span><h3>AWS EBA를 통한 영업관리시스템 모더나이제이션의 시작</h3><span class="card-bottom"><span>ARTICLE</span><b>원문 열기 ↗</b></span></a>
-          <a class="card" href="/eba-video"><span class="card-top"><span class="number">02</span><span class="chip">youtube.com</span></span><span class="url"><span>sooyeol.com/</span>eba-video <b>↗</b></span><h3>영업관리 시스템과 조직 문화 모더나이제이션 여정</h3><span class="card-bottom"><span>VIDEO</span><b>원문 열기 ↗</b></span></a>
-          <a class="card" href="/event-message"><span class="card-top"><span class="number">03</span><span class="chip">techblog.jobkorea.co.kr</span></span><span class="url"><span>sooyeol.com/</span>event-message <b>↗</b></span><h3>이벤트 메시징 플랫폼 비교 — SQS / SNS / Kafka</h3><span class="card-bottom"><span>ARTICLE</span><b>원문 열기 ↗</b></span></a>
-          <a class="card" href="/jpa-jsonb"><span class="card-top"><span class="number">04</span><span class="chip">techblog.jobkorea.co.kr</span></span><span class="url"><span>sooyeol.com/</span>jpa-jsonb <b>↗</b></span><h3>PostgreSQL JSONB와 JPA 다형성 구현</h3><span class="card-bottom"><span>ARTICLE</span><b>원문 열기 ↗</b></span></a>
-          <a class="card" href="/ai-sprint"><span class="card-top"><span class="number">05</span><span class="chip">blog.sooyeol.com</span></span><span class="url"><span>sooyeol.com/</span>ai-sprint <b>↗</b></span><h3>AI Coding Assistant를 실제 업무와 스프린트에 적용하기</h3><span class="card-bottom"><span>NOTE</span><b>원문 열기 ↗</b></span></a>
-          <a class="card" href="/ai-app"><span class="card-top"><span class="number">06</span><span class="chip">blog.sooyeol.com</span></span><span class="url"><span>sooyeol.com/</span>ai-app <b>↗</b></span><h3>AI Agent와 함께 앱을 기획하고 출시한 회고</h3><span class="card-bottom"><span>NOTE</span><b>원문 열기 ↗</b></span></a>
+          <article class="card"><span class="card-top"><span class="number">01</span><span class="chip">techblog.jobkorea.co.kr</span></span><a class="url" href="/eba"><span>sooyeol.com/</span>eba <b>↗</b></a><h3>AWS EBA를 통한 영업관리시스템 모더나이제이션의 시작</h3><span class="card-bottom"><span>ARTICLE</span><span class="card-actions"><button class="copy-button" data-copy="/eba" type="button">URL 복사</button><a class="open-link" href="/eba">원문 열기 ↗</a></span></span></article>
+          <article class="card"><span class="card-top"><span class="number">02</span><span class="chip">youtube.com</span></span><a class="url" href="/eba-video"><span>sooyeol.com/</span>eba-video <b>↗</b></a><h3>영업관리 시스템과 조직 문화 모더나이제이션 여정</h3><span class="card-bottom"><span>VIDEO</span><span class="card-actions"><button class="copy-button" data-copy="/eba-video" type="button">URL 복사</button><a class="open-link" href="/eba-video">원문 열기 ↗</a></span></span></article>
+          <article class="card"><span class="card-top"><span class="number">03</span><span class="chip">techblog.jobkorea.co.kr</span></span><a class="url" href="/event-message"><span>sooyeol.com/</span>event-message <b>↗</b></a><h3>이벤트 메시징 플랫폼 비교 — SQS / SNS / Kafka</h3><span class="card-bottom"><span>ARTICLE</span><span class="card-actions"><button class="copy-button" data-copy="/event-message" type="button">URL 복사</button><a class="open-link" href="/event-message">원문 열기 ↗</a></span></span></article>
+          <article class="card"><span class="card-top"><span class="number">04</span><span class="chip">techblog.jobkorea.co.kr</span></span><a class="url" href="/jpa-jsonb"><span>sooyeol.com/</span>jpa-jsonb <b>↗</b></a><h3>PostgreSQL JSONB와 JPA 다형성 구현</h3><span class="card-bottom"><span>ARTICLE</span><span class="card-actions"><button class="copy-button" data-copy="/jpa-jsonb" type="button">URL 복사</button><a class="open-link" href="/jpa-jsonb">원문 열기 ↗</a></span></span></article>
+          <article class="card"><span class="card-top"><span class="number">05</span><span class="chip">blog.sooyeol.com</span></span><a class="url" href="/ai-sprint"><span>sooyeol.com/</span>ai-sprint <b>↗</b></a><h3>AI Coding Assistant를 실제 업무와 스프린트에 적용하기</h3><span class="card-bottom"><span>NOTE</span><span class="card-actions"><button class="copy-button" data-copy="/ai-sprint" type="button">URL 복사</button><a class="open-link" href="/ai-sprint">원문 열기 ↗</a></span></span></article>
+          <article class="card"><span class="card-top"><span class="number">06</span><span class="chip">blog.sooyeol.com</span></span><a class="url" href="/ai-app"><span>sooyeol.com/</span>ai-app <b>↗</b></a><h3>AI Agent와 함께 앱을 기획하고 출시한 회고</h3><span class="card-bottom"><span>NOTE</span><span class="card-actions"><button class="copy-button" data-copy="/ai-app" type="button">URL 복사</button><a class="open-link" href="/ai-app">원문 열기 ↗</a></span></span></article>
         </div>
       </section>
     </main>
+    <script>
+      document.querySelectorAll("[data-copy]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const shortUrl = `https://sooyeol.com${button.dataset.copy}`;
+          await navigator.clipboard.writeText(shortUrl);
+          button.textContent = "복사됨 ✓";
+          button.classList.add("is-copied");
+          window.setTimeout(() => {
+            button.textContent = "URL 복사";
+            button.classList.remove("is-copied");
+          }, 1800);
+        });
+      });
+    </script>
   </body>
 </html>

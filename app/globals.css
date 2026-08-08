@@ -475,6 +475,34 @@ h1 em {
   color: var(--orange);
 }
 
+.public-card-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.public-card-actions button {
+  background: transparent;
+  border: 1px solid #d3cfc4;
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 650;
+  min-width: 66px;
+  padding: 7px 10px;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.public-card-actions button:hover {
+  border-color: var(--ink);
+}
+
+.public-card-actions button.is-copied {
+  background: var(--acid);
+  border-color: var(--acid);
+}
+
 .card-index {
   color: #aaa69b;
   font-family: var(--font-geist-mono), monospace;
@@ -690,6 +718,17 @@ footer span:first-child {
   .link-card {
     min-height: 275px;
     padding: 24px 20px 20px;
+  }
+
+  .public-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .public-card-actions {
+    justify-content: space-between;
+    width: 100%;
   }
 
   footer {

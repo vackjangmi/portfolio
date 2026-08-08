@@ -11,6 +11,8 @@ type ShortLink = {
   createdAt: string;
 };
 
+const publicOrigin = "https://sooyeol.com";
+
 function domainOf(url: string) {
   try {
     return new URL(url).hostname.replace(/^www\./, "");
@@ -23,6 +25,7 @@ export default function Home() {
   const [links, setLinks] = useState<ShortLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [copiedSlug, setCopiedSlug] = useState("");
 
   useEffect(() => {
     fetch("/api/links", { cache: "no-store" })
@@ -36,6 +39,12 @@ export default function Home() {
       )
       .finally(() => setLoading(false));
   }, []);
+
+  async function copyLink(slug: string) {
+    await navigator.clipboard.writeText(`${publicOrigin}/${slug}`);
+    setCopiedSlug(slug);
+    window.setTimeout(() => setCopiedSlug(""), 1800);
+  }
 
   return (
     <main className="bare-directory">
@@ -58,7 +67,16 @@ export default function Home() {
                 <h3>{link.title || domainOf(link.targetUrl)}</h3>
                 <div className="card-footer public-card-footer">
                   <span>{link.clickCount.toLocaleString("ko-KR")}회 방문</span>
-                  <a href={`/${link.slug}`}>원문 열기 ↗</a>
+                  <div className="public-card-actions">
+                    <button
+                      className={copiedSlug === link.slug ? "is-copied" : ""}
+                      onClick={() => copyLink(link.slug)}
+                      type="button"
+                    >
+                      {copiedSlug === link.slug ? "복사됨 ✓" : "URL 복사"}
+                    </button>
+                    <a href={`/${link.slug}`}>원문 열기 ↗</a>
+                  </div>
                 </div>
               </article>
             ))}
