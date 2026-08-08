@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "sooyeol.link — 기억하기 쉬운 짧은 주소",
-  description: "긴 링크를 sooyeol.com의 짧고 선명한 주소로 바꿉니다.",
+  title: "sooyeol.com — 짧은 주소 목록",
+  description: "글과 영상으로 바로 가는 sooyeol.com의 짧은 주소 모음입니다.",
 };
 
 export default function RootLayout({

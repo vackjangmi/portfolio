@@ -104,6 +104,13 @@ main {
   text-decoration: none;
 }
 
+.directory-label {
+  color: #77746c;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+
 .count {
   align-items: center;
   background: var(--orange);
@@ -163,6 +170,43 @@ h1 em {
   letter-spacing: -0.025em;
   line-height: 1.65;
   margin: 38px 0 54px;
+}
+
+.public-hero {
+  padding-bottom: 86px;
+}
+
+.public-intro {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+}
+
+.public-intro .hero-copy {
+  margin-bottom: 0;
+}
+
+.link-total {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.link-total strong {
+  color: var(--orange);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 52px;
+  letter-spacing: -0.08em;
+  line-height: 0.9;
+}
+
+.link-total span,
+.section-note {
+  color: #8a867d;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
 }
 
 .creator {
@@ -397,11 +441,26 @@ h1 em {
   background: #f8f5ed;
 }
 
+.public-link-card {
+  min-height: 250px;
+}
+
 .card-topline,
 .card-footer {
   align-items: center;
   display: flex;
   justify-content: space-between;
+}
+
+.public-card-footer a {
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.public-card-footer a:hover {
+  color: var(--orange);
 }
 
 .card-index {
@@ -538,6 +597,20 @@ footer span:first-child {
 
   .hero-copy {
     margin: 28px 0 36px;
+  }
+
+  .public-intro {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 34px;
+  }
+
+  .link-total {
+    align-items: flex-start;
+  }
+
+  .directory-label {
+    display: none;
   }
 
   .creator {

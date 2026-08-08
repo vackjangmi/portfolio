@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="sooyeol.com의 짧은 주소 목록" />
+    <title>sooyeol.com — 짧은 주소 목록</title>
+    <style>
+      :root {
+        --paper: #f3f0e8;
+        --ink: #151512;
+        --muted: #77746c;
+        --line: #cdc8bc;
+        --orange: #ff5d36;
+        --acid: #dfff4f;
+        --white: #fffdf7;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        background: radial-gradient(circle at 1px 1px, rgba(21,21,18,.12) 1px, transparent 0) 0 0/24px 24px, var(--paper);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+        margin: 0;
+      }
+      a { color: inherit; }
+      .topbar {
+        align-items: center;
+        border-bottom: 1px solid rgba(21,21,18,.22);
+        display: flex;
+        height: 76px;
+        justify-content: space-between;
+        margin: auto;
+        max-width: 1168px;
+        padding: 0 24px;
+      }
+      .brand {
+        align-items: center;
+        display: flex;
+        font-size: 15px;
+        font-weight: 750;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .brand-mark {
+        align-items: center;
+        background: var(--ink);
+        border-radius: 50%;
+        color: var(--acid);
+        display: inline-flex;
+        font-family: ui-monospace, monospace;
+        height: 34px;
+        justify-content: center;
+        width: 34px;
+      }
+      .label {
+        color: var(--muted);
+        font-family: ui-monospace, monospace;
+        font-size: 9px;
+        letter-spacing: .13em;
+      }
+      .hero {
+        margin: auto;
+        max-width: 1120px;
+        padding: 94px 24px 86px;
+      }
+      .eyebrow {
+        align-items: center;
+        display: flex;
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 650;
+        gap: 10px;
+        letter-spacing: .13em;
+        margin-bottom: 28px;
+      }
+      .eyebrow::before {
+        background: var(--orange);
+        border-radius: 50%;
+        content: "";
+        height: 8px;
+        width: 8px;
+      }
+      h1 {
+        font-size: clamp(58px, 8.7vw, 112px);
+        letter-spacing: -.075em;
+        line-height: .89;
+        margin: 0;
+      }
+      h1 em {
+        color: var(--orange);
+        font-family: Georgia, serif;
+        font-weight: 400;
+      }
+      .intro {
+        align-items: end;
+        display: flex;
+        justify-content: space-between;
+      }
+      .intro p {
+        color: #555249;
+        font-size: clamp(16px, 2vw, 20px);
+        line-height: 1.65;
+        margin: 38px 0 0;
+      }
+      .total { text-align: right; }
+      .total strong {
+        color: var(--orange);
+        display: block;
+        font-family: ui-monospace, monospace;
+        font-size: 52px;
+        letter-spacing: -.08em;
+        line-height: .9;
+      }
+      .total span {
+        color: var(--muted);
+        font-family: ui-monospace, monospace;
+        font-size: 9px;
+        letter-spacing: .08em;
+      }
+      .directory {
+        background: var(--white);
+        border-top: 1px solid var(--line);
+        padding: 96px max(24px, calc((100vw - 1120px)/2)) 110px;
+      }
+      .section-head {
+        align-items: end;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 38px;
+      }
+      .section-head small {
+        color: var(--orange);
+        display: block;
+        font-family: ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .15em;
+        margin-bottom: 10px;
+      }
+      h2 {
+        font-size: clamp(34px, 5vw, 54px);
+        letter-spacing: -.055em;
+        line-height: 1;
+        margin: 0;
+      }
+      .grid {
+        border-left: 1px solid var(--line);
+        border-top: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .card {
+        border-bottom: 1px solid var(--line);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        min-height: 252px;
+        padding: 26px 28px 24px;
+        text-decoration: none;
+        transition: background .18s ease;
+      }
+      .card:hover { background: #f7f3ea; }
+      .card-top, .card-bottom {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+      }
+      .number {
+        color: #aaa69b;
+        font-family: ui-monospace, monospace;
+        font-size: 10px;
+      }
+      .chip {
+        background: #eeebe3;
+        border-radius: 999px;
+        color: #6c6961;
+        font-family: ui-monospace, monospace;
+        font-size: 9px;
+        padding: 7px 10px;
+      }
+      .url {
+        font-family: ui-monospace, monospace;
+        font-size: clamp(21px, 3vw, 30px);
+        font-weight: 700;
+        letter-spacing: -.06em;
+        margin: 35px 0 16px;
+      }
+      .url span { color: #a29f96; }
+      .url b { color: var(--orange); font-family: sans-serif; font-size: 16px; margin-left: 5px; }
+      .card h3 {
+        font-size: 16px;
+        line-height: 1.45;
+        margin: 0 0 24px;
+      }
+      .card-bottom {
+        border-top: 1px solid #e3dfd5;
+        color: var(--muted);
+        font-family: ui-monospace, monospace;
+        font-size: 9px;
+        margin-top: auto;
+        padding-top: 15px;
+      }
+      .card-bottom b { color: var(--ink); }
+      footer {
+        background: var(--ink);
+        color: #8d8b83;
+        display: flex;
+        font-family: ui-monospace, monospace;
+        font-size: 10px;
+        justify-content: space-between;
+        letter-spacing: .1em;
+        padding: 28px max(24px, calc((100vw - 1120px)/2));
+      }
+      footer strong { color: var(--acid); }
+      @media (max-width: 700px) {
+        .topbar { height: 66px; }
+        .label { display: none; }
+        .hero { padding: 66px 24px 68px; }
+        .intro { align-items: flex-start; flex-direction: column; gap: 34px; }
+        .total { text-align: left; }
+        .directory { padding-bottom: 72px; padding-top: 70px; }
+        .section-head { align-items: flex-start; flex-direction: column; gap: 18px; }
+        .grid { grid-template-columns: 1fr; }
+        .card { min-height: 235px; padding: 24px 20px 20px; }
+        footer { flex-direction: column; gap: 10px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/"><span class="brand-mark">s/</span>sooyeol.com</a>
+      <span class="label">SHORT LINK DIRECTORY</span>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="eyebrow">CURATED BY SOOYEOL</div>
+        <h1>필요한 링크를<br /><em>짧게, 바로.</em></h1>
+        <div class="intro">
+          <p>글과 영상으로 바로 가는 짧은 입구입니다.<br />주소를 누르면 원문으로 이동합니다.</p>
+          <div class="total"><strong>06</strong><span>ACTIVE LINKS</span></div>
+        </div>
+      </section>
+      <section class="directory">
+        <div class="section-head">
+          <div><small>DIRECTORY</small><h2>짧은 주소 목록</h2></div>
+          <span class="label">클릭하면 원문으로 이동합니다 ↗</span>
+        </div>
+        <div class="grid">
+          <a class="card" href="/eba"><span class="card-top"><span class="number">01</span><span class="chip">techblog.jobkorea.co.kr</span></span><span class="url"><span>sooyeol.com/</span>eba <b>↗</b></span><h3>AWS EBA를 통한 영업관리시스템 모더나이제이션의 시작</h3><span class="card-bottom"><span>ARTICLE</span><b>원문 열기 ↗</b></span></a>
+          <a class="card" href="/eba-video"><span class="card-top"><span class="number">02</span><span class="chip">youtube.com</span></span><span class="url"><span>sooyeol.com/</span>eba-video <b>↗</b></span><h3>영업관리 시스템과 조직 문화 모더나이제이션 여정</h3><span class="card-bottom"><span>VIDEO</span><b>원문 열기 ↗</b></span></a>
+          <a class="card" href="/event-message"><span class="card-top"><span class="number">03</span><span class="chip">techblog.jobkorea.co.kr</span></span><span class="url"><span>sooyeol.com/</span>event-message <b>↗</b></span><h3>이벤트 메시징 플랫폼 비교 — SQS / SNS / Kafka</h3><span class="card-bottom"><span>ARTICLE</span><b>원문 열기 ↗</b></span></a>
+          <a class="card" href="/jpa-jsonb"><span class="card-top"><span class="number">04</span><span class="chip">techblog.jobkorea.co.kr</span></span><span class="url"><span>sooyeol.com/</span>jpa-jsonb <b>↗</b></span><h3>PostgreSQL JSONB와 JPA 다형성 구현</h3><span class="card-bottom"><span>ARTICLE</span><b>원문 열기 ↗</b></span></a>
+          <a class="card" href="/ai-sprint"><span class="card-top"><span class="number">05</span><span class="chip">blog.sooyeol.com</span></span><span class="url"><span>sooyeol.com/</span>ai-sprint <b>↗</b></span><h3>AI Coding Assistant를 실제 업무와 스프린트에 적용하기</h3><span class="card-bottom"><span>NOTE</span><b>원문 열기 ↗</b></span></a>
+          <a class="card" href="/ai-app"><span class="card-top"><span class="number">06</span><span class="chip">blog.sooyeol.com</span></span><span class="url"><span>sooyeol.com/</span>ai-app <b>↗</b></span><h3>AI Agent와 함께 앱을 기획하고 출시한 회고</h3><span class="card-bottom"><span>NOTE</span><b>원문 열기 ↗</b></span></a>
+        </div>
+      </section>
+    </main>
+    <footer><strong>sooyeol.com</strong><span>SHORT LINKS · LONG MEMORY</span></footer>
+  </body>
+</html>
