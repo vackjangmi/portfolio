@@ -1,1 +1,210 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>English Speaking Practice</title>
+  <style>
+    :root { color-scheme:light; --ink:#152033; --muted:#687386; --line:#dfe5ee; --accent:#2563eb; --soft:#eff6ff; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:#f4f7fb; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { width:min(840px,calc(100% - 28px)); margin:28px auto; }
+    .page-head { background:#fff; border:1px solid var(--line); border-radius:22px; padding:28px; box-shadow:0 18px 50px rgba(35,55,90,.08); }
+    h1 { margin:0 0 8px; font-size:27px; }
+    .lead { margin:0; color:var(--muted); line-height:1.55; }
+    .toolbar { display:grid; grid-template-columns:1fr auto; gap:18px; align-items:end; margin-top:22px; }
+    .speed-box { padding:16px; border:1px solid var(--line); border-radius:14px; }
+    .speed-head { display:flex; justify-content:space-between; margin-bottom:10px; }
+    .speed-value { font-weight:800; color:var(--accent); font-variant-numeric:tabular-nums; }
+    input[type=range] { width:100%; accent-color:var(--accent); }
+    .marks { display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-top:5px; }
+    .global-controls,.section-controls { display:flex; gap:9px; flex-wrap:wrap; }
+    button { border:0; border-radius:11px; padding:11px 15px; font-size:14px; font-weight:750; cursor:pointer; }
+    .primary { color:#fff; background:var(--accent); }
+    .secondary { color:var(--ink); background:#edf1f6; }
+    .section { margin-top:18px; padding:25px; background:#fff; border:1px solid var(--line); border-radius:20px; }
+    .section-head { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:16px; }
+    .section-title { margin:0; font-size:20px; }
+    .sentence { padding:13px 14px; border:1px solid transparent; border-radius:12px; font-size:20px; line-height:1.65; transition:.15s ease; }
+    .sentence + .sentence { margin-top:4px; }
+    .sentence.active { background:var(--soft); border-color:#93c5fd; }
+    .phrase { display:inline; border-radius:6px; cursor:pointer; }
+    .phrase:hover { color:var(--accent); background:#f1f5f9; }
+    .phrase.active { color:#fff; background:var(--accent); padding:2px 4px; }
+    .break { color:#b0bac8; padding:0 7px; font-weight:400; user-select:none; }
+    .hint { margin:17px 3px 0; color:var(--muted); font-size:13px; line-height:1.55; }
+    @media (max-width:620px) {
+      .page-head,.section { padding:20px; }
+      .toolbar { grid-template-columns:1fr; }
+      .section-head { align-items:flex-start; flex-direction:column; }
+      .sentence { font-size:18px; padding:11px 9px; }
+    }
+  </style>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;ri=AAEwVAARY29tLmdvb2dsZS5DaHJvbWUAtmh0dHBzOi8vY2hhdGdwdC5jb20vYmFja2VuZC1hcGkvZXN0dWFyeS9jb250ZW50P2lkPWZpbGVfMDAwMDAwMDBlYTZjODIyZmFmYTcyNDFmOWFkNjZjNTImdHM9NDk2Mjk0JnA9ZnMmY2lkPTEmc2lnPTQ4MzU1MmVkOTRhNTEyMjBmMDExOTQ2OWIyZjg5MDNiMTUwNzBkNjkxOWI1YWI5YTE3NGZmZGNlOWY5ODQwNDgmdj0w"></script>
+</head>
+<body>
+  <main>
+    <header class="page-head">
+      <h1>English Speaking Practice</h1>
+      <p class="lead">섹션별로 듣고 따라 말해 보세요. 회색 슬래시(/)에서는 짧게 쉬어 읽으면 발표가 자연스럽습니다.</p>
+      <div class="toolbar">
+        <div class="speed-box">
+          <div class="speed-head"><strong>재생 속도</strong><span class="speed-value" id="speedValue">0.8×</span></div>
+          <input id="speed" type="range" min="0.5" max="1.5" step="0.1" value="0.8" aria-label="재생 속도">
+          <div class="marks"><span>0.5× 느리게</span><span>1.0× 보통</span><span>1.5× 빠르게</span></div>
+        </div>
+        <div class="global-controls">
+          <button class="secondary" id="pause">⏸ 일시 정지</button>
+          <button class="secondary" id="stop">■ 정지</button>
+        </div>
+      </div>
+    </header>
+    <div id="sections"></div>
+    <p class="hint">▶ 섹션 듣기는 선택한 섹션만 재생하고 자동으로 다음 섹션으로 넘어가지 않습니다. 영어 구절을 누르면 해당 부분만 다시 들을 수 있습니다.</p>
+  </main>
 
+  <script>
+    const sections = [
+      {
+        title: "Section 1 · Robot Cultural Experience System",
+        sentences: [
+          ["Many students learn about culture", "from books or videos."],
+          ["But it is easier to understand culture", "when we can see it", "and experience it ourselves."],
+          ["So we made", "a robot cultural experience system."],
+          ["Visitors can learn Korean culture", "by watching and using our robots."]
+        ]
+      },
+      {
+        title: "Section 2 · Guide Robot",
+        sentences: [
+          ["Lastly,", "this is our Guide Robot."],
+          ["Museums are easier to understand", "when someone explains the exhibits."],
+          ["Our Guide Robot moves around with visitors", "using a joystick."],
+          ["It explains the Turtle Ship and Hangul", "in simple English."],
+          ["The robot helps visitors learn", "about Korean history and culture."]
+        ]
+      }
+    ];
+
+    const sectionsEl = document.querySelector('#sections');
+    const speed = document.querySelector('#speed');
+    const speedValue = document.querySelector('#speedValue');
+    const pauseButton = document.querySelector('#pause');
+    let queue = [], current = null, speaking = false, runId = 0, timer = null;
+
+    sections.forEach((section, sectionIndex) => {
+      const card = document.createElement('section');
+      card.className = 'section';
+      const head = document.createElement('div');
+      head.className = 'section-head';
+      head.innerHTML = `<h2 class="section-title">${section.title}</h2>`;
+      const controls = document.createElement('div');
+      controls.className = 'section-controls';
+      const play = document.createElement('button');
+      play.className = 'primary';
+      play.textContent = '▶ 섹션 듣기';
+      play.addEventListener('click', () => playSection(sectionIndex));
+      controls.appendChild(play);
+      head.appendChild(controls);
+      card.appendChild(head);
+
+      section.sentences.forEach((phrases, sentenceIndex) => {
+        const sentence = document.createElement('div');
+        sentence.className = 'sentence';
+        sentence.dataset.section = sectionIndex;
+        sentence.dataset.sentence = sentenceIndex;
+        phrases.forEach((phrase, phraseIndex) => {
+          const phraseEl = document.createElement('span');
+          phraseEl.className = 'phrase';
+          phraseEl.textContent = phrase;
+          phraseEl.dataset.section = sectionIndex;
+          phraseEl.dataset.sentence = sentenceIndex;
+          phraseEl.dataset.phrase = phraseIndex;
+          phraseEl.addEventListener('click', () => start([{ sectionIndex, sentenceIndex, phraseIndex }]));
+          sentence.appendChild(phraseEl);
+          if (phraseIndex < phrases.length - 1) {
+            const marker = document.createElement('span');
+            marker.className = 'break';
+            marker.textContent = '/';
+            sentence.appendChild(marker);
+          }
+        });
+        card.appendChild(sentence);
+      });
+      sectionsEl.appendChild(card);
+    });
+
+    function americanVoice() {
+      const voices = speechSynthesis.getVoices();
+      return voices.find(v => v.lang === 'en-US' && /Samantha|Google US English|Microsoft/i.test(v.name))
+        || voices.find(v => v.lang === 'en-US')
+        || voices.find(v => v.lang.startsWith('en'));
+    }
+
+    function sectionQueue(sectionIndex) {
+      const result = [];
+      sections[sectionIndex].sentences.forEach((phrases, sentenceIndex) => {
+        phrases.forEach((_, phraseIndex) => result.push({ sectionIndex, sentenceIndex, phraseIndex }));
+      });
+      return result;
+    }
+
+    function highlight(item) {
+      document.querySelectorAll('.sentence,.phrase').forEach(el => el.classList.remove('active'));
+      if (!item) return;
+      document.querySelector(`.sentence[data-section="${item.sectionIndex}"][data-sentence="${item.sentenceIndex}"]`)?.classList.add('active');
+      document.querySelector(`.phrase[data-section="${item.sectionIndex}"][data-sentence="${item.sentenceIndex}"][data-phrase="${item.phraseIndex}"]`)?.classList.add('active');
+    }
+
+    function speakNext(id) {
+      if (id !== runId) return;
+      if (!queue.length) { speaking = false; current = null; highlight(null); return; }
+      current = queue.shift();
+      highlight(current);
+      const words = sections[current.sectionIndex].sentences[current.sentenceIndex][current.phraseIndex];
+      const utterance = new SpeechSynthesisUtterance(words);
+      utterance.lang = 'en-US';
+      utterance.rate = Number(speed.value);
+      utterance.pitch = 1;
+      const voice = americanVoice();
+      if (voice) utterance.voice = voice;
+      utterance.onend = () => {
+        if (id !== runId) return;
+        const next = queue[0];
+        const sentenceEnded = next && (next.sentenceIndex !== current.sentenceIndex);
+        timer = setTimeout(() => speakNext(id), sentenceEnded ? 650 : 340);
+      };
+      utterance.onerror = () => { if (id === runId) { speaking = false; highlight(null); } };
+      speaking = true;
+      speechSynthesis.speak(utterance);
+    }
+
+    function start(items) {
+      runId += 1;
+      clearTimeout(timer);
+      speechSynthesis.cancel();
+      queue = [...items];
+      pauseButton.textContent = '⏸ 일시 정지';
+      const id = runId;
+      timer = setTimeout(() => speakNext(id), 80);
+    }
+
+    function playSection(sectionIndex) { start(sectionQueue(sectionIndex)); }
+
+    pauseButton.addEventListener('click', () => {
+      if (speechSynthesis.paused) { speechSynthesis.resume(); pauseButton.textContent = '⏸ 일시 정지'; }
+      else if (speechSynthesis.speaking) { speechSynthesis.pause(); pauseButton.textContent = '▶ 계속 듣기'; }
+    });
+    document.querySelector('#stop').addEventListener('click', () => {
+      runId += 1; clearTimeout(timer); speechSynthesis.cancel(); queue=[]; speaking=false; current=null; highlight(null);
+      pauseButton.textContent = '⏸ 일시 정지';
+    });
+    speed.addEventListener('input', () => {
+      speedValue.textContent = `${Number(speed.value).toFixed(1)}×`;
+      if (speaking && current) start([current, ...queue]);
+    });
+    window.addEventListener('beforeunload', () => speechSynthesis.cancel());
+    speechSynthesis.getVoices();
+  </script>
+</body>
+</html>
