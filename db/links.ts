@@ -49,6 +49,18 @@ const seedLinks = [
     targetUrl: "https://blog.sooyeol.com/2026/03/opencode.html",
     title: "AI Agent와 함께 앱을 기획하고 출시한 회고",
   },
+  {
+    id: "seed-11st-slack",
+    slug: "11st-slack",
+    targetUrl: "https://slack.com/intl/ko-kr/customer-stories/11st-story",
+    title: "연동할수록 편해지는 시스템, 11번가의 Slack 활용법",
+  },
+  {
+    id: "seed-search-nori",
+    slug: "search-nori",
+    targetUrl: "https://blog.sooyeol.com/2019/12/elasticsearch-nori.html",
+    title: "사내 게시판 검색 — Elasticsearch와 Nori, 사용자·유의어 사전",
+  },
 ] as const;
 
 export async function ensureLinksStorage() {
