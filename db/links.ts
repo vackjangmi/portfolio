@@ -83,7 +83,7 @@ const seedLinks: SeedLink[] = [
   },
   {
     id: "seed-app-triangle-hopscotch",
-    slug: "triangle-hopscotch",
+    slug: "triangle",
     targetUrl: "https://app.sooyeol.com/apps/triangle-hopscotch/",
     androidUrl:
       "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.trianglehopscotch",
@@ -92,7 +92,7 @@ const seedLinks: SeedLink[] = [
   },
   {
     id: "seed-app-memorygame",
-    slug: "memorygame",
+    slug: "memory",
     targetUrl: "https://app.sooyeol.com/apps/memorygame/",
     androidUrl:
       "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.memorygame",
@@ -101,7 +101,7 @@ const seedLinks: SeedLink[] = [
   },
   {
     id: "seed-app-sliding-puzzle",
-    slug: "sliding-puzzle",
+    slug: "puzzle",
     targetUrl: "https://app.sooyeol.com/apps/sliding-puzzle/",
     androidUrl:
       "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.slidingpuzzle",
@@ -119,7 +119,7 @@ const seedLinks: SeedLink[] = [
   },
   {
     id: "seed-app-reflex-game",
-    slug: "reflex-game",
+    slug: "reflex",
     targetUrl: "https://app.sooyeol.com/apps/reflex-game/",
     androidUrl:
       "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.reflexgame",
@@ -128,7 +128,7 @@ const seedLinks: SeedLink[] = [
   },
   {
     id: "seed-app-tabgroup-browser",
-    slug: "tabgroup-browser",
+    slug: "browser",
     targetUrl: "https://app.sooyeol.com/apps/tabgroup-browswer/",
     androidUrl:
       "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.tabgroup.browser",

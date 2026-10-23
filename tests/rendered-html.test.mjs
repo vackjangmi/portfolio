@@ -55,6 +55,8 @@ test("keeps persistence, redirects, and initial links wired", async () => {
   assert.match(redirect, /Response\.redirect\(link\.androidUrl, 302\)/);
   assert.match(redirect, /Response\.redirect\(link\.iosUrl, 302\)/);
   assert.match(redirect, /navigator\.maxTouchPoints/);
+  assert.match(redirect, /"triangle-hopscotch": "triangle"/);
+  assert.match(redirect, /"tabgroup-browser": "browser"/);
   assert.match(redirect, /export async function HEAD/);
   assert.match(linksApi, /slugPattern/);
   assert.match(linksApi, /android_url AS androidUrl/);
@@ -63,12 +65,12 @@ test("keeps persistence, redirects, and initial links wired", async () => {
   assert.match(storage, /"jpa-jsonb"/);
   for (const slug of [
     "sudoku",
-    "triangle-hopscotch",
-    "memorygame",
-    "sliding-puzzle",
+    "triangle",
+    "memory",
+    "puzzle",
     "scanote",
-    "reflex-game",
-    "tabgroup-browser",
+    "reflex",
+    "browser",
   ]) {
     assert.match(storage, new RegExp(`slug: "${slug}"`));
   }
@@ -88,48 +90,50 @@ test("keeps persistence, redirects, and initial links wired", async () => {
 
 test("routes all seven static app links by device", async () => {
   const apps = [
-    ["sudoku", "xyz.sooyeol.apps.solidsudoku", "6759184547", "sudoku"],
-    ["triangle-hopscotch", "xyz.sooyeol.apps.trianglehopscotch", "6759189170", "triangle-hopscotch"],
-    ["memorygame", "xyz.sooyeol.apps.memorygame", "6759896288", "memorygame"],
-    ["sliding-puzzle", "xyz.sooyeol.apps.slidingpuzzle", "6760256107", "sliding-puzzle"],
-    ["scanote", "xyz.sooyeol.apps.scanote", "6759282130", "scanote"],
-    ["reflex-game", "xyz.sooyeol.apps.reflexgame", "6763530343", "reflex-game"],
-    ["tabgroup-browser", "xyz.sooyeol.apps.tabgroup.browser", "6763546370", "tabgroup-browswer"],
+    ["sudoku", [], "xyz.sooyeol.apps.solidsudoku", "6759184547", "sudoku"],
+    ["triangle", ["triangle-hopscotch"], "xyz.sooyeol.apps.trianglehopscotch", "6759189170", "triangle-hopscotch"],
+    ["memory", ["memorygame"], "xyz.sooyeol.apps.memorygame", "6759896288", "memorygame"],
+    ["puzzle", ["sliding-puzzle"], "xyz.sooyeol.apps.slidingpuzzle", "6760256107", "sliding-puzzle"],
+    ["scanote", [], "xyz.sooyeol.apps.scanote", "6759282130", "scanote"],
+    ["reflex", ["reflex-game"], "xyz.sooyeol.apps.reflexgame", "6763530343", "reflex-game"],
+    ["browser", ["tabgroup-browser"], "xyz.sooyeol.apps.tabgroup.browser", "6763546370", "tabgroup-browswer"],
   ];
   const home = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
-  for (const [slug, packageId, appStoreId, introductionSlug] of apps) {
-    const html = await readFile(
-      new URL(`../${slug}/index.html`, import.meta.url),
-      "utf8",
-    );
-    const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
-    assert.ok(script, `${slug} redirect script should exist`);
+  for (const [slug, legacySlugs, packageId, appStoreId, introductionSlug] of apps) {
+    for (const routeSlug of [slug, ...legacySlugs]) {
+      const html = await readFile(
+        new URL(`../${routeSlug}/index.html`, import.meta.url),
+        "utf8",
+      );
+      const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+      assert.ok(script, `${routeSlug} redirect script should exist`);
 
-    assert.equal(
-      redirectFrom(script, {
-        userAgent: "Mozilla/5.0 (Linux; Android 15; Pixel 9)",
-        platform: "Linux armv8l",
-        maxTouchPoints: 5,
-      }),
-      `https://play.google.com/store/apps/details?id=${packageId}`,
-    );
-    assert.match(
-      redirectFrom(script, {
-        userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X)",
-        platform: "iPhone",
-        maxTouchPoints: 5,
-      }),
-      new RegExp(`apps\\.apple\\.com/(?:kr/)?app/id${appStoreId}$`),
-    );
-    assert.equal(
-      redirectFrom(script, {
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-        platform: "Win32",
-        maxTouchPoints: 0,
-      }),
-      `https://app.sooyeol.com/apps/${introductionSlug}/`,
-    );
+      assert.equal(
+        redirectFrom(script, {
+          userAgent: "Mozilla/5.0 (Linux; Android 15; Pixel 9)",
+          platform: "Linux armv8l",
+          maxTouchPoints: 5,
+        }),
+        `https://play.google.com/store/apps/details?id=${packageId}`,
+      );
+      assert.match(
+        redirectFrom(script, {
+          userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X)",
+          platform: "iPhone",
+          maxTouchPoints: 5,
+        }),
+        new RegExp(`apps\\.apple\\.com/(?:kr/)?app/id${appStoreId}$`),
+      );
+      assert.equal(
+        redirectFrom(script, {
+          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+          platform: "Win32",
+          maxTouchPoints: 0,
+        }),
+        `https://app.sooyeol.com/apps/${introductionSlug}/`,
+      );
+    }
     assert.match(home, new RegExp(`href="/${slug}"`));
     assert.match(home, new RegExp(`data-copy="/${slug}"`));
   }

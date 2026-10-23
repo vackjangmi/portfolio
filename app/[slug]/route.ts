@@ -1,11 +1,20 @@
 import { ensureLinksStorage, getLinksDb } from "../../db/links";
 
+const legacyAppSlugs: Record<string, string> = {
+  "triangle-hopscotch": "triangle",
+  memorygame: "memory",
+  "sliding-puzzle": "puzzle",
+  "reflex-game": "reflex",
+  "tabgroup-browser": "browser",
+};
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await context.params;
-  const link = await findLink(slug);
+  const canonicalSlug = canonicalAppSlug(slug);
+  const link = await findLink(canonicalSlug);
 
   if (!link) {
     return new Response(
@@ -16,7 +25,7 @@ export async function GET(
 
   await getLinksDb()
     .prepare("UPDATE links SET click_count = click_count + 1 WHERE slug = ?")
-    .bind(slug.toLowerCase())
+    .bind(canonicalSlug)
     .run();
 
   if (isAndroid(request) && link.androidUrl) {
@@ -41,7 +50,7 @@ export async function HEAD(
   context: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await context.params;
-  const link = await findLink(slug);
+  const link = await findLink(canonicalAppSlug(slug));
 
   if (!link) return new Response(null, { status: 404 });
   return Response.redirect(targetForRequest(request, link), 302);
@@ -62,6 +71,11 @@ async function findLink(slug: string) {
       androidUrl: string | null;
       iosUrl: string | null;
     }>();
+}
+
+function canonicalAppSlug(slug: string) {
+  const normalizedSlug = slug.toLowerCase();
+  return legacyAppSlugs[normalizedSlug] ?? normalizedSlug;
 }
 
 type LinkTarget = NonNullable<Awaited<ReturnType<typeof findLink>>>;

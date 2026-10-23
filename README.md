@@ -15,6 +15,10 @@
 주소를 선택 입력합니다. Android는 Google Play, iPhone·iPad는 App Store,
 그 외 환경은 기본 소개 페이지로 이동합니다.
 
+공개 앱 주소는 `/sudoku`, `/triangle`, `/memory`, `/puzzle`, `/scanote`,
+`/reflex`, `/browser`를 사용합니다. 기존의 긴 앱 주소도 호환용으로 계속
+동작합니다.
+
 ## 실행
 
 ```bash
