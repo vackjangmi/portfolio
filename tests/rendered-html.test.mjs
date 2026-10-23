@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
-
-const templateRoot = new URL("../", import.meta.url);
+import { runInNewContext } from "node:vm";
 
 async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -53,11 +52,26 @@ test("keeps persistence, redirects, and initial links wired", async () => {
   assert.match(page, /navigator\.clipboard\.writeText/);
   assert.match(admin, /method: "POST"/);
   assert.match(redirect, /Response\.redirect\(link\.targetUrl, 302\)/);
+  assert.match(redirect, /Response\.redirect\(link\.androidUrl, 302\)/);
+  assert.match(redirect, /Response\.redirect\(link\.iosUrl, 302\)/);
+  assert.match(redirect, /navigator\.maxTouchPoints/);
   assert.match(redirect, /export async function HEAD/);
   assert.match(linksApi, /slugPattern/);
+  assert.match(linksApi, /android_url AS androidUrl/);
   assert.match(storage, /"eba-video"/);
   assert.match(storage, /"event-message"/);
   assert.match(storage, /"jpa-jsonb"/);
+  for (const slug of [
+    "sudoku",
+    "triangle-hopscotch",
+    "memorygame",
+    "sliding-puzzle",
+    "scanote",
+    "reflex-game",
+    "tabgroup-browser",
+  ]) {
+    assert.match(storage, new RegExp(`slug: "${slug}"`));
+  }
   assert.match(staticIndex, /href="\/eba-video"/);
   assert.match(staticIndex, /href="\/event-message"/);
   assert.match(staticIndex, /href="\/jpa-jsonb"/);
@@ -71,3 +85,65 @@ test("keeps persistence, redirects, and initial links wired", async () => {
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
   await assert.rejects(access(new URL("../public/og.png", import.meta.url)));
 });
+
+test("routes all seven static app links by device", async () => {
+  const apps = [
+    ["sudoku", "xyz.sooyeol.apps.solidsudoku", "6759184547", "sudoku"],
+    ["triangle-hopscotch", "xyz.sooyeol.apps.trianglehopscotch", "6759189170", "triangle-hopscotch"],
+    ["memorygame", "xyz.sooyeol.apps.memorygame", "6759896288", "memorygame"],
+    ["sliding-puzzle", "xyz.sooyeol.apps.slidingpuzzle", "6760256107", "sliding-puzzle"],
+    ["scanote", "xyz.sooyeol.apps.scanote", "6759282130", "scanote"],
+    ["reflex-game", "xyz.sooyeol.apps.reflexgame", "6763530343", "reflex-game"],
+    ["tabgroup-browser", "xyz.sooyeol.apps.tabgroup.browser", "6763546370", "tabgroup-browswer"],
+  ];
+  const home = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  for (const [slug, packageId, appStoreId, introductionSlug] of apps) {
+    const html = await readFile(
+      new URL(`../${slug}/index.html`, import.meta.url),
+      "utf8",
+    );
+    const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+    assert.ok(script, `${slug} redirect script should exist`);
+
+    assert.equal(
+      redirectFrom(script, {
+        userAgent: "Mozilla/5.0 (Linux; Android 15; Pixel 9)",
+        platform: "Linux armv8l",
+        maxTouchPoints: 5,
+      }),
+      `https://play.google.com/store/apps/details?id=${packageId}`,
+    );
+    assert.match(
+      redirectFrom(script, {
+        userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X)",
+        platform: "iPhone",
+        maxTouchPoints: 5,
+      }),
+      new RegExp(`apps\\.apple\\.com/(?:kr/)?app/id${appStoreId}$`),
+    );
+    assert.equal(
+      redirectFrom(script, {
+        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        platform: "Win32",
+        maxTouchPoints: 0,
+      }),
+      `https://app.sooyeol.com/apps/${introductionSlug}/`,
+    );
+    assert.match(home, new RegExp(`href="/${slug}"`));
+    assert.match(home, new RegExp(`data-copy="/${slug}"`));
+  }
+});
+
+function redirectFrom(script, navigator) {
+  let redirectedTo;
+  runInNewContext(script, {
+    navigator,
+    location: {
+      replace(target) {
+        redirectedTo = target;
+      },
+    },
+  });
+  return redirectedTo;
+}

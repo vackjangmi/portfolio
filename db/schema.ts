@@ -5,6 +5,8 @@ export const links = sqliteTable("links", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull().unique(),
   targetUrl: text("target_url").notNull(),
+  androidUrl: text("android_url"),
+  iosUrl: text("ios_url"),
   title: text("title").notNull().default(""),
   clickCount: integer("click_count").notNull().default(0),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),

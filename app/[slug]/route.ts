@@ -1,7 +1,7 @@
 import { ensureLinksStorage, getLinksDb } from "../../db/links";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await context.params;
@@ -19,26 +19,96 @@ export async function GET(
     .bind(slug.toLowerCase())
     .run();
 
+  if (isAndroid(request) && link.androidUrl) {
+    return Response.redirect(link.androidUrl, 302);
+  }
+
+  if (isIos(request) && link.iosUrl) {
+    return Response.redirect(link.iosUrl, 302);
+  }
+
+  // iPadOS can identify itself as macOS. A tiny client-side check keeps
+  // desktop Macs on the introduction page while sending touch iPads to iOS.
+  if (isMacintosh(request) && link.iosUrl) {
+    return ipadAwareRedirect(link.iosUrl, link.targetUrl);
+  }
+
   return Response.redirect(link.targetUrl, 302);
 }
 
 export async function HEAD(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await context.params;
   const link = await findLink(slug);
 
   if (!link) return new Response(null, { status: 404 });
-  return Response.redirect(link.targetUrl, 302);
+  return Response.redirect(targetForRequest(request, link), 302);
 }
 
 async function findLink(slug: string) {
   await ensureLinksStorage();
   return getLinksDb()
-    .prepare("SELECT target_url AS targetUrl FROM links WHERE slug = ? LIMIT 1")
+    .prepare(
+      `SELECT target_url AS targetUrl,
+              android_url AS androidUrl,
+              ios_url AS iosUrl
+       FROM links WHERE slug = ? LIMIT 1`,
+    )
     .bind(slug.toLowerCase())
-    .first<{ targetUrl: string }>();
+    .first<{
+      targetUrl: string;
+      androidUrl: string | null;
+      iosUrl: string | null;
+    }>();
+}
+
+type LinkTarget = NonNullable<Awaited<ReturnType<typeof findLink>>>;
+
+function targetForRequest(request: Request, link: LinkTarget) {
+  if (isAndroid(request) && link.androidUrl) return link.androidUrl;
+  if (isIos(request) && link.iosUrl) return link.iosUrl;
+  return link.targetUrl;
+}
+
+function isAndroid(request: Request) {
+  const platform = request.headers.get("sec-ch-ua-platform") ?? "";
+  const userAgent = request.headers.get("user-agent") ?? "";
+  return /android/i.test(`${platform} ${userAgent}`);
+}
+
+function isIos(request: Request) {
+  const platform = request.headers.get("sec-ch-ua-platform") ?? "";
+  const userAgent = request.headers.get("user-agent") ?? "";
+  return /ios|iphone|ipad|ipod/i.test(`${platform} ${userAgent}`);
+}
+
+function isMacintosh(request: Request) {
+  return /macintosh/i.test(request.headers.get("user-agent") ?? "");
+}
+
+function ipadAwareRedirect(iosUrl: string, fallbackUrl: string) {
+  const safeIosUrl = jsonForScript(iosUrl);
+  const safeFallbackUrl = jsonForScript(fallbackUrl);
+  const escapedFallbackUrl = escapeHtml(fallbackUrl);
+
+  return new Response(
+    `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>앱 페이지로 이동 중</title></head><body><script>const isIPad=navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1;location.replace(isIPad?${safeIosUrl}:${safeFallbackUrl});</script><noscript><p><a href="${escapedFallbackUrl}">앱 소개 페이지로 이동</a></p></noscript></body></html>`,
+    {
+      headers: {
+        "cache-control": "private, no-store",
+        "content-type": "text/html; charset=utf-8",
+      },
+    },
+  );
+}
+
+function jsonForScript(value: string) {
+  return JSON.stringify(value)
+    .replaceAll("<", "\\u003c")
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
 }
 
 function escapeHtml(value: string) {

@@ -293,6 +293,11 @@ h1 em {
   border-right: 1px solid #3d3d38;
 }
 
+.store-grid label {
+  border-bottom: 1px solid #3d3d38;
+  padding-top: 18px;
+}
+
 .form-grid label > span {
   color: #8f8d85;
   font-size: 11px;
@@ -567,6 +572,16 @@ h1 em {
   white-space: nowrap;
 }
 
+.platform-targets {
+  color: #77746c;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  gap: 6px 14px;
+  margin: -14px 0 20px;
+}
+
 .card-footer {
   border-top: 1px solid #e3dfd5;
   color: #77746c;
@@ -677,6 +692,10 @@ footer span:first-child {
   }
 
   .form-grid label:first-child {
+    border-right: 0;
+  }
+
+  .store-grid label:first-child {
     border-right: 0;
   }
 

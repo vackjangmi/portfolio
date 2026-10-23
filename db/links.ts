@@ -4,12 +4,23 @@ export type LinkRow = {
   id: string;
   slug: string;
   targetUrl: string;
+  androidUrl: string | null;
+  iosUrl: string | null;
   title: string;
   clickCount: number;
   createdAt: string;
 };
 
-const seedLinks = [
+type SeedLink = {
+  id: string;
+  slug: string;
+  targetUrl: string;
+  androidUrl?: string;
+  iosUrl?: string;
+  title: string;
+};
+
+const seedLinks: SeedLink[] = [
   {
     id: "seed-modernize",
     slug: "eba-video",
@@ -61,39 +72,106 @@ const seedLinks = [
     targetUrl: "https://blog.sooyeol.com/2019/12/elasticsearch-nori.html",
     title: "사내 게시판 검색 — Elasticsearch와 Nori, 사용자·유의어 사전",
   },
-] as const;
+  {
+    id: "seed-app-sudoku",
+    slug: "sudoku",
+    targetUrl: "https://app.sooyeol.com/apps/sudoku/",
+    androidUrl:
+      "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.solidsudoku",
+    iosUrl: "https://apps.apple.com/app/id6759184547",
+    title: "할만한 스도쿠",
+  },
+  {
+    id: "seed-app-triangle-hopscotch",
+    slug: "triangle-hopscotch",
+    targetUrl: "https://app.sooyeol.com/apps/triangle-hopscotch/",
+    androidUrl:
+      "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.trianglehopscotch",
+    iosUrl: "https://apps.apple.com/app/id6759189170",
+    title: "할만한 세모 땅따먹기",
+  },
+  {
+    id: "seed-app-memorygame",
+    slug: "memorygame",
+    targetUrl: "https://app.sooyeol.com/apps/memorygame/",
+    androidUrl:
+      "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.memorygame",
+    iosUrl: "https://apps.apple.com/app/id6759896288",
+    title: "할만한 메모리 게임",
+  },
+  {
+    id: "seed-app-sliding-puzzle",
+    slug: "sliding-puzzle",
+    targetUrl: "https://app.sooyeol.com/apps/sliding-puzzle/",
+    androidUrl:
+      "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.slidingpuzzle",
+    iosUrl: "https://apps.apple.com/app/id6760256107",
+    title: "할만한 슬라이딩 퍼즐",
+  },
+  {
+    id: "seed-app-scanote",
+    slug: "scanote",
+    targetUrl: "https://app.sooyeol.com/apps/scanote/",
+    androidUrl:
+      "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.scanote",
+    iosUrl: "https://apps.apple.com/kr/app/id6759282130",
+    title: "쓸만한 스캔노트",
+  },
+  {
+    id: "seed-app-reflex-game",
+    slug: "reflex-game",
+    targetUrl: "https://app.sooyeol.com/apps/reflex-game/",
+    androidUrl:
+      "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.reflexgame",
+    iosUrl: "https://apps.apple.com/app/id6763530343",
+    title: "할만한 순발력 게임",
+  },
+  {
+    id: "seed-app-tabgroup-browser",
+    slug: "tabgroup-browser",
+    targetUrl: "https://app.sooyeol.com/apps/tabgroup-browswer/",
+    androidUrl:
+      "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.tabgroup.browser",
+    iosUrl: "https://apps.apple.com/app/id6763546370",
+    title: "쓸만한 탭그룹 브라우저",
+  },
+];
 
-export async function ensureLinksStorage() {
+let storageReady: Promise<void> | undefined;
+
+export function ensureLinksStorage() {
+  storageReady ??= initializeLinksStorage().catch((error) => {
+    storageReady = undefined;
+    throw error;
+  });
+  return storageReady;
+}
+
+async function initializeLinksStorage() {
   const db = getLinksDb();
-
-  await db.batch([
-    db.prepare(`
-      CREATE TABLE IF NOT EXISTS links (
-        id TEXT PRIMARY KEY NOT NULL,
-        slug TEXT NOT NULL UNIQUE,
-        target_url TEXT NOT NULL,
-        title TEXT NOT NULL DEFAULT '',
-        click_count INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `),
-    db.prepare(
-      "CREATE UNIQUE INDEX IF NOT EXISTS idx_links_slug ON links (slug)",
-    ),
-  ]);
 
   await db.batch(
     seedLinks.map((link) =>
       db
         .prepare(
-          `INSERT INTO links (id, slug, target_url, title)
-           VALUES (?, ?, ?, ?)
+          `INSERT INTO links
+             (id, slug, target_url, android_url, ios_url, title)
+           VALUES (?, ?, ?, ?, ?, ?)
            ON CONFLICT(id) DO UPDATE SET
              slug = excluded.slug,
              target_url = excluded.target_url,
+             android_url = excluded.android_url,
+             ios_url = excluded.ios_url,
              title = excluded.title`,
         )
-        .bind(link.id, link.slug, link.targetUrl, link.title),
+        .bind(
+          link.id,
+          link.slug,
+          link.targetUrl,
+          link.androidUrl ?? null,
+          link.iosUrl ?? null,
+          link.title,
+        ),
     ),
   );
 }

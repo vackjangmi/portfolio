@@ -1,11 +1,14 @@
 "use client";
 
+/* eslint-disable @next/next/no-html-link-for-pages */
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type ShortLink = {
   id: string;
   slug: string;
   targetUrl: string;
+  androidUrl: string | null;
+  iosUrl: string | null;
   title: string;
   clickCount: number;
   createdAt: string;
@@ -33,6 +36,8 @@ export default function AdminPage() {
   const [links, setLinks] = useState<ShortLink[]>([]);
   const [slug, setSlug] = useState("");
   const [targetUrl, setTargetUrl] = useState("");
+  const [androidUrl, setAndroidUrl] = useState("");
+  const [iosUrl, setIosUrl] = useState("");
   const [title, setTitle] = useState("");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -40,29 +45,40 @@ export default function AdminPage() {
   const [message, setMessage] = useState("");
   const [copiedSlug, setCopiedSlug] = useState("");
 
-  async function loadLinks() {
-    try {
-      const response = await fetch("/api/links", { cache: "no-store" });
-      if (!response.ok) throw new Error("목록을 불러오지 못했습니다.");
-      setLinks((await response.json()) as ShortLink[]);
-    } catch (error) {
-      setMessage(
-        error instanceof Error ? error.message : "잠시 후 다시 시도해 주세요.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    loadLinks();
+    let cancelled = false;
+
+    fetch("/api/links", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("목록을 불러오지 못했습니다.");
+        return (await response.json()) as ShortLink[];
+      })
+      .then((result) => {
+        if (!cancelled) setLinks(result);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setMessage(
+            error instanceof Error
+              ? error.message
+              : "잠시 후 다시 시도해 주세요.",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredLinks = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return links;
     return links.filter((link) =>
-      [link.slug, link.title, link.targetUrl]
+      [link.slug, link.title, link.targetUrl, link.androidUrl, link.iosUrl]
         .join(" ")
         .toLowerCase()
         .includes(normalized),
@@ -78,7 +94,7 @@ export default function AdminPage() {
       const response = await fetch("/api/links", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ slug, targetUrl, title }),
+        body: JSON.stringify({ slug, targetUrl, androidUrl, iosUrl, title }),
       });
       const result = (await response.json()) as ShortLink & { error?: string };
       if (!response.ok) throw new Error(result.error ?? "주소를 만들지 못했습니다.");
@@ -86,6 +102,8 @@ export default function AdminPage() {
       setLinks((current) => [result, ...current]);
       setSlug("");
       setTargetUrl("");
+      setAndroidUrl("");
+      setIosUrl("");
       setTitle("");
       setMessage(`sooyeol.com/${result.slug} 주소를 만들었습니다.`);
       await copyLink(result.slug);
@@ -173,7 +191,7 @@ export default function AdminPage() {
 
           <div className="form-grid">
             <label>
-              <span>긴 주소</span>
+              <span>기본 주소 <small>앱 링크는 소개 페이지</small></span>
               <input
                 onChange={(event) => setTargetUrl(event.target.value)}
                 placeholder="https://..."
@@ -189,6 +207,27 @@ export default function AdminPage() {
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder="나중에 알아볼 수 있게"
                 value={title}
+              />
+            </label>
+          </div>
+
+          <div className="form-grid store-grid">
+            <label>
+              <span>Google Play <small>선택</small></span>
+              <input
+                onChange={(event) => setAndroidUrl(event.target.value)}
+                placeholder="https://play.google.com/store/apps/..."
+                type="url"
+                value={androidUrl}
+              />
+            </label>
+            <label>
+              <span>App Store <small>선택</small></span>
+              <input
+                onChange={(event) => setIosUrl(event.target.value)}
+                placeholder="https://apps.apple.com/app/..."
+                type="url"
+                value={iosUrl}
               />
             </label>
           </div>
@@ -237,7 +276,11 @@ export default function AdminPage() {
               <article className="link-card" key={link.id}>
                 <div className="card-topline">
                   <span className="card-index">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="domain-chip">{domainOf(link.targetUrl)}</span>
+                  <span className="domain-chip">
+                    {link.androidUrl || link.iosUrl
+                      ? "SMART APP LINK"
+                      : domainOf(link.targetUrl)}
+                  </span>
                 </div>
 
                 <a className="short-link" href={`/${link.slug}`}>
@@ -245,6 +288,12 @@ export default function AdminPage() {
                 </a>
                 <h3>{link.title || domainOf(link.targetUrl)}</h3>
                 <p className="target-url">{link.targetUrl}</p>
+                {(link.androidUrl || link.iosUrl) && (
+                  <p className="platform-targets">
+                    {link.androidUrl && <span>Android · {domainOf(link.androidUrl)}</span>}
+                    {link.iosUrl && <span>iOS · {domainOf(link.iosUrl)}</span>}
+                  </p>
+                )}
 
                 <div className="card-footer">
                   <span>{link.clickCount.toLocaleString("ko-KR")}회 방문</span>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>할만한 슬라이딩 퍼즐로 이동 중...</title>
+    <script>
+      (() => {
+        const device = `${navigator.userAgent || ""} ${navigator.userAgentData?.platform || navigator.platform || ""}`;
+        const isAndroid = /android/i.test(device);
+        const isIOS = /iphone|ipad|ipod/i.test(device) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        const target = isAndroid
+          ? "https://play.google.com/store/apps/details?id=xyz.sooyeol.apps.slidingpuzzle"
+          : isIOS
+            ? "https://apps.apple.com/app/id6760256107"
+            : "https://app.sooyeol.com/apps/sliding-puzzle/";
+        location.replace(target);
+      })();
+    </script>
+    <noscript><meta http-equiv="refresh" content="0;url=https://app.sooyeol.com/apps/sliding-puzzle/" /></noscript>
+  </head>
+  <body><a href="https://app.sooyeol.com/apps/sliding-puzzle/">앱 소개 페이지로 이동</a></body>
+</html>

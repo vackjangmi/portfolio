@@ -13,6 +13,7 @@ export async function GET() {
   const result = await getLinksDb()
     .prepare(
       `SELECT id, slug, target_url AS targetUrl, title,
+              android_url AS androidUrl, ios_url AS iosUrl,
               click_count AS clickCount, created_at AS createdAt
        FROM links
        ORDER BY created_at DESC, slug ASC`,
@@ -25,7 +26,13 @@ export async function GET() {
 export async function POST(request: Request) {
   await ensureLinksStorage();
 
-  let body: { slug?: unknown; targetUrl?: unknown; title?: unknown };
+  let body: {
+    slug?: unknown;
+    targetUrl?: unknown;
+    androidUrl?: unknown;
+    iosUrl?: unknown;
+    title?: unknown;
+  };
   try {
     body = await request.json();
   } catch {
@@ -34,6 +41,9 @@ export async function POST(request: Request) {
 
   const slug = typeof body.slug === "string" ? body.slug.trim().toLowerCase() : "";
   const targetUrl = typeof body.targetUrl === "string" ? body.targetUrl.trim() : "";
+  const androidUrl =
+    typeof body.androidUrl === "string" ? body.androidUrl.trim() : "";
+  const iosUrl = typeof body.iosUrl === "string" ? body.iosUrl.trim() : "";
   const title = typeof body.title === "string" ? body.title.trim().slice(0, 100) : "";
 
   if (slug.length < 2 || slug.length > 32 || !slugPattern.test(slug)) {
@@ -47,15 +57,28 @@ export async function POST(request: Request) {
     return Response.json({ error: "사용할 수 없는 이름입니다." }, { status: 400 });
   }
 
-  let parsedTarget: URL;
-  try {
-    parsedTarget = new URL(targetUrl);
-  } catch {
-    return Response.json({ error: "올바른 웹 주소를 입력해 주세요." }, { status: 400 });
+  const parsedTarget = parseWebUrl(targetUrl);
+  if (!parsedTarget) {
+    return Response.json(
+      { error: "올바른 기본 또는 소개 페이지 주소를 입력해 주세요." },
+      { status: 400 },
+    );
   }
 
-  if (!['http:', 'https:'].includes(parsedTarget.protocol)) {
-    return Response.json({ error: "http 또는 https 주소만 사용할 수 있습니다." }, { status: 400 });
+  const parsedAndroid = androidUrl ? parseWebUrl(androidUrl) : null;
+  if (androidUrl && !parsedAndroid) {
+    return Response.json(
+      { error: "올바른 Google Play 주소를 입력해 주세요." },
+      { status: 400 },
+    );
+  }
+
+  const parsedIos = iosUrl ? parseWebUrl(iosUrl) : null;
+  if (iosUrl && !parsedIos) {
+    return Response.json(
+      { error: "올바른 App Store 주소를 입력해 주세요." },
+      { status: 400 },
+    );
   }
 
   const existing = await getLinksDb()
@@ -69,14 +92,24 @@ export async function POST(request: Request) {
   const id = crypto.randomUUID();
   await getLinksDb()
     .prepare(
-      "INSERT INTO links (id, slug, target_url, title) VALUES (?, ?, ?, ?)",
+      `INSERT INTO links
+         (id, slug, target_url, android_url, ios_url, title)
+       VALUES (?, ?, ?, ?, ?, ?)`,
     )
-    .bind(id, slug, parsedTarget.toString(), title)
+    .bind(
+      id,
+      slug,
+      parsedTarget.toString(),
+      parsedAndroid?.toString() ?? null,
+      parsedIos?.toString() ?? null,
+      title,
+    )
     .run();
 
   const created = await getLinksDb()
     .prepare(
       `SELECT id, slug, target_url AS targetUrl, title,
+              android_url AS androidUrl, ios_url AS iosUrl,
               click_count AS clickCount, created_at AS createdAt
        FROM links WHERE id = ?`,
     )
@@ -84,4 +117,13 @@ export async function POST(request: Request) {
     .first<LinkRow>();
 
   return Response.json(created, { status: 201 });
+}
+
+function parseWebUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return ["http:", "https:"].includes(url.protocol) ? url : null;
+  } catch {
+    return null;
+  }
 }

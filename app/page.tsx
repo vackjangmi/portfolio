@@ -6,6 +6,8 @@ type ShortLink = {
   id: string;
   slug: string;
   targetUrl: string;
+  androidUrl: string | null;
+  iosUrl: string | null;
   title: string;
   clickCount: number;
   createdAt: string;
@@ -59,7 +61,11 @@ export default function Home() {
               <article className="link-card public-link-card" key={link.id}>
                 <div className="card-topline">
                   <span className="card-index">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="domain-chip">{domainOf(link.targetUrl)}</span>
+                  <span className="domain-chip">
+                    {link.androidUrl || link.iosUrl
+                      ? "ANDROID · IOS"
+                      : domainOf(link.targetUrl)}
+                  </span>
                 </div>
                 <a className="short-link" href={`/${link.slug}`}>
                   <span>sooyeol.com/</span>{link.slug} <span aria-hidden="true">↗</span>
